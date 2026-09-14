@@ -1,0 +1,23 @@
+.shipment-info {
+    padding: 1rem 0;
+    box-sizing: border-box; }
+
+.shipment-info .tracking-display {
+    box-sizing: border-box;
+    height: .5rem;
+    border-radius: .25rem;
+    background-color: #FFCDD2;
+    position: relative; }
+
+.shipment-info .tracking-display img {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    width: 2rem;
+    height: 2rem; }
+
+.shipment-info .tracking-display .tracking-status {
+    width: 0;
+    height: 100%;
+    background-color: #C22130;
+    border-radius: inherit; }

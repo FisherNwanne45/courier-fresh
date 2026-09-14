@@ -1,0 +1,142 @@
+$(function(){
+    $(document).on('change', 'select', function(e) {
+        e.preventDefault();
+
+        $('#shipmentIdentifier').focus();
+
+    });
+
+    let width = $(window).width();
+
+    if (width < 992) {
+        $('#products').removeClass('show');
+        $('#progress').removeClass('show');
+    } else {
+        $('#products').addClass('show');
+        $('#progress').addClass('show');
+
+    }
+
+});
+
+
+/**
+ * Tracks a shipment based on the entered shipment identifier
+ */
+function trackShipment() {
+    let id = $('#shipmentIdentifier').val();
+    let trackBy = $('#trackBy').val();
+
+    location.href = '/tracking/viewShipment?id=' + id + '&trackBy=' + trackBy;
+    return false;
+
+}
+
+/**
+ * Calculates and animates the tracking meter
+ *
+ * @param events
+ */
+function calcTrackingMeter(events) {
+    let currentStatus = {};
+
+    for (let event of events) {
+        let description = event.Description.substr(0, 9);
+
+        if (description === 'DELIVERED') {
+            currentStatus.Description = 'DELIVERED';
+            break;
+        } else {
+            currentStatus = events.slice(-1)[0];
+        }
+
+    }
+
+    console.log('Current Status', currentStatus);
+
+    //let currentStatus = events.slice(-1)[0];
+    let fill = 0;
+
+    if (currentStatus.Description === 'PICK UP DISPATCHED') { fill = 5; }
+    else if (currentStatus.Description === 'Shipment created.') { fill = 10; }
+    else if (currentStatus.Description !== 'OUT FOR DELIVERY' && currentStatus.Description !== 'DELIVERED') {
+        let local_copy_events = [];
+
+        events.forEach((event) => {
+            local_copy_events.push(event.Description);
+        });
+
+        let undesired_events = [
+            'PICK UP DISPATCHED',
+            'Shipment created.',
+            'OUT FOR DELIVERY',
+            'DELIVERED'
+        ];
+
+        let difference = local_copy_events
+            .filter(x => !undesired_events.includes(x));
+
+        let num_events = difference.length;
+
+        let parts = 80 / num_events;
+
+        fill = 90 - parts;
+
+    }
+    else if (currentStatus.Description === 'OUT FOR DELIVERY') { fill = 90; }
+    else if (currentStatus.Description === 'DELIVERED') { fill = 100; }
+
+    $('.tracking-status').animate({width: fill + "%"}, 2000);
+
+
+}
+
+/**
+ * Allows the user to sign up for alerts concerning the current shipment
+ */
+function alertsSignup(identifier) {
+    let bDeparture = !!$('#bDeparture').is(':checked');
+    let bArrival   = !!$('#bArrival').is(':checked');
+    let recipient  = $('#alertsSMSRecipient').val();
+    recipient = recipient.replace(/\D/g, '');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let trackBy = urlParams.get('trackBy');
+
+    let url = "/tracking/alerts/sms/" + identifier;
+
+    $.get(url, {
+        shipmentNumber: identifier,
+        bDeparture: bDeparture,
+        bArrival: bArrival,
+        recipient: recipient,
+        trackBy: trackBy
+        }).done(function(res) {
+            console.log(res);
+
+            $('#modal_Alerts').modal('hide');
+
+            if (res.status === 'success') {
+                createMessage(res.message);
+
+            } else if (res.status === 'invalid') {
+                createWarning(res.message);
+
+            } else if (res.status === 'failed') {
+                createError(res.message);
+
+            }
+        });
+
+
+}
+
+/**
+ * Opens Proof of Delivery in a new tab so it can be printed
+ *
+ * @param shipmentIdentifier
+ */
+function openProofOfDelivery(shipmentIdentifier) {
+    window.open('/tracking/proofOfDelivery/' + shipmentIdentifier, '_blank');
+
+}

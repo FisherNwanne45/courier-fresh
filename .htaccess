@@ -1,0 +1,22 @@
+Options -Indexes
+
+<FilesMatch "^composer\.(json|lock)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+RewriteEngine On
+
+# Exclude specific folders from rewriting
+RewriteCond %{REQUEST_URI} !^/resources/ [NC]
+RewriteCond %{REQUEST_URI} !^/webmail/ [NC]
+
+# Only rewrite if the request is not a file and not a directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^\.]+)$ $1.php [NC,L]

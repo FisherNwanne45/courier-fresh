@@ -1,0 +1,9 @@
+# These are raw seed content for install/seed.php to read from disk -- never
+# meant to be requested directly.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

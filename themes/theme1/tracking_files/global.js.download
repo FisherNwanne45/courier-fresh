@@ -1,0 +1,49 @@
+$(document).ready(function() {
+    setTimeZone();
+
+});
+
+$(document).on('click', '#menu-toggle', function(e) {
+    e.preventDefault();
+    $('nav').toggleClass('show');
+
+});
+
+function createMessage(message) {
+    let container = $('.notifications-container');
+
+    container.append(`<div class="notification message remove">${message}</div>`)
+        .children('.remove')
+        .fadeOut(3200);
+
+}
+
+function createWarning(warning) {
+    let container = $('.notifications-container');
+
+    container.append(`<div class="notification warning remove">${warning}</div>`)
+        .children('.remove')
+        .fadeOut(3200);
+
+}
+
+function createError(error) {
+    let container = $('.notifications-container');
+
+    container.append(`<div class="notification error remove">${error}</div>`)
+        .children('.remove')
+        .fadeOut(3200);
+
+}
+
+function setTimeZone() {
+    let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    $.ajax({
+        url: "/rpc/setTimeZone",
+        type: "get",
+        data: {
+            timezone: timezone
+        }
+    });
+}

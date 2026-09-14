@@ -1,0 +1,10 @@
+# Block direct web access to anything that isn't meant to be served.
+<FilesMatch "(^\.env$|\.sql$|^error_log$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
